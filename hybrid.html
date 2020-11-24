@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hybrid CNN</title>
+    <meta name="author" content="syt123450 / https://github.com/syt123450">
+
+    <script src="three.min.js"></script>
+    <script src="tween.min.js"></script>
+    <script src="tf.min.js"></script>
+    <script src="TrackballControls.js"></script>
+    <script src="tensorspace.min.js"></script>
+    <script src="stats.min.js"></script>
+    <script src="jquery.min.js"></script>
+
+    <style>
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div id="container"></div>
+<div id="container2"></div>
+<script>
+
+    $(function() {
+
+        let modelContainer = document.getElementById( "container" );
+        let model = new TSP.models.Sequential(modelContainer,{stats:true});
+
+        model.add(new TSP.layers.RGBInput({ shape: [ 556, 270, 3] }));
+        model.add(new TSP.layers.Conv2d());
+        model.add(new TSP.layers.Pooling2d());
+        model.add(new TSP.layers.Conv2d());
+        model.add(new TSP.layers.Pooling2d());
+        model.add(new TSP.layers.Conv2d());
+        model.add(new TSP.layers.Pooling2d());
+        model.add(new TSP.layers.Conv2d());
+        model.add(new TSP.layers.Flatten( { shape : [ 4800 ] } ));
+        model.add(new TSP.layers.Dense( { shape : [ 84 ] ,initStatus: "open" } ));
+        model.add(new TSP.layers.Dense( { shape : [ 20 ],initStatus: "open" } ));
+        model.add( new TSP.layers.Output1d({
+            units : 2,
+            outputs: ["Normal", "Abnormal"]
+        }) );
+        model.load({
+            type: "tensorflow",
+            url: 'EL241/model.json'
+        });
+		model.init( function() {
+
+            console.log("Model Loaded");
+            $.ajax({
+				url: "a0002_10024_A-2.json",
+				type: 'GET',
+				async: true,
+				dataType: 'json',
+				success: function (data) {
+
+					model.predict( data );
+
+				}
+			});
+
+        } );
+        
+        let modelContainer_1 = document.getElementById( "container");
+        let model_1 = new TSP.models.Sequential(modelContainer_1,{stats : true} );
+        
+
+        model_1.add(new TSP.layers.RGBInput({ shape: [ 476, 272, 3] }));
+        model_1.add(new TSP.layers.Conv2d());
+        model_1.add(new TSP.layers.Pooling2d());
+        model_1.add(new TSP.layers.Conv2d());
+        model_1.add(new TSP.layers.Pooling2d());
+        model_1.add(new TSP.layers.Conv2d());
+        model_1.add(new TSP.layers.Pooling2d());
+        model_1.add(new TSP.layers.Conv2d());
+        model_1.add(new TSP.layers.Flatten( { shape : [ 3840 ] } ));
+        model_1.add( new TSP.layers.Output1d({
+            units : 2,
+            outputs: ["Normal", "Abnormal"]
+        }) );
+        model_1.load({
+            type: "tensorflow",
+            url: 'EL252/model.json'
+        });
+		model_1.init( function() {
+
+            console.log("Model Loaded");
+            $.ajax({
+				url: "a0002_10024_A.json",
+				type: 'GET',
+				async: true,
+				dataType: 'json',
+				success: function (data) {
+
+					model_1.predict( data );
+
+				}
+			});
+
+		} );
+
+  
+    });
+
+</script>
+
+</body>
+</html>
